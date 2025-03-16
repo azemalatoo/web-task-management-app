@@ -2,8 +2,14 @@ package org.example.webtaskmanagementapp.entity;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
+import lombok.*;
 import org.example.webtaskmanagementapp.enums.TaskStatus;
 
+@Getter
+@Setter
+@AllArgsConstructor
+@NoArgsConstructor
+@ToString
 @Entity
 public class Task {
 
