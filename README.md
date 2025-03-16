@@ -52,3 +52,19 @@ The app includes:
 - **Create User**: `POST /api/users` → User creation.
 - **Update User**: `PUT /api/users/{id}` → Update user.
 - **Delete User**: `DELETE /api/users/{id}` → Delete user.
+- 
+## Tech Stack
+
+The following technologies are used to build the Task Management App:
+
+- **JDK**: 17
+- **Spring Boot**: Version 3.4.3
+- **Swagger**: For API documentation (using Springdoc OpenAPI for Swagger UI integration)
+- **Maven**: For dependency management and project build
+
+## Swagger Integration
+
+Swagger is integrated into the project using **Springdoc OpenAPI** to automatically generate API documentation and provide an interactive UI.
+
+- **API Documentation URL**:  
+  After running the app, you can access the Swagger UI at: http://localhost:8080/swagger-ui.html
