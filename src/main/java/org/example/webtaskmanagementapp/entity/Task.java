@@ -10,6 +10,7 @@ import org.example.webtaskmanagementapp.enums.TaskStatus;
 @AllArgsConstructor
 @NoArgsConstructor
 @ToString
+@Builder
 @Entity
 public class Task {
 
