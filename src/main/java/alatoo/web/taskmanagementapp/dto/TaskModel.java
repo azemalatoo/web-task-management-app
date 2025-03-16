@@ -10,10 +10,8 @@ public class TaskModel {
     private TaskStatus status;
     private Long userId;
 
-    // Default constructor
     public TaskModel() {}
 
-    // All-args constructor
     public TaskModel(Long id, String title, String description, TaskStatus status, Long userId) {
         this.id = id;
         this.title = title;
@@ -22,7 +20,6 @@ public class TaskModel {
         this.userId = userId;
     }
 
-    // Getter and Setter for id
     public Long getId() {
         return id;
     }
@@ -31,7 +28,6 @@ public class TaskModel {
         this.id = id;
     }
 
-    // Getter and Setter for title
     public String getTitle() {
         return title;
     }
@@ -40,7 +36,6 @@ public class TaskModel {
         this.title = title;
     }
 
-    // Getter and Setter for description
     public String getDescription() {
         return description;
     }
@@ -49,7 +44,6 @@ public class TaskModel {
         this.description = description;
     }
 
-    // Getter and Setter for status
     public TaskStatus getStatus() {
         return status;
     }
@@ -58,7 +52,6 @@ public class TaskModel {
         this.status = status;
     }
 
-    // Getter and Setter for userId
     public Long getUserId() {
         return userId;
     }
@@ -67,7 +60,6 @@ public class TaskModel {
         this.userId = userId;
     }
 
-    // Optional: toString method for easier debugging or logging
     @Override
     public String toString() {
         return "TaskModel{" +

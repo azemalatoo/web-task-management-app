@@ -6,6 +6,7 @@ import jakarta.validation.constraints.NotBlank;
 import java.util.List;
 
 @Entity
+@Table(name = "`user`")
 public class User {
 
     @Id

@@ -1,22 +1,24 @@
 package alatoo.web.taskmanagementapp.controller;
 
 import alatoo.web.taskmanagementapp.dto.UserModel;
+import alatoo.web.taskmanagementapp.response.ResponseCode;
 import alatoo.web.taskmanagementapp.service.UserService;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.springframework.boot.test.context.SpringBootTest;
+import org.mockito.MockitoAnnotations;
+import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import java.util.List;
 
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-@SpringBootTest
 public class UserControllerTest {
 
     @Mock
@@ -26,74 +28,82 @@ public class UserControllerTest {
     private UserController userController;
 
     private MockMvc mockMvc;
-    private UserModel userModel;
+    private ObjectMapper objectMapper;
 
     @BeforeEach
-    public void setUp() {
+    void setUp() {
+        MockitoAnnotations.openMocks(this);
         mockMvc = MockMvcBuilders.standaloneSetup(userController).build();
-
-        userModel = new UserModel();
-        userModel.setId(1L);
-        userModel.setUsername("John Doe");
-        userModel.setPassword("123");
+        objectMapper = new ObjectMapper();
     }
 
     @Test
-    public void testGetAllUsers() throws Exception {
-        when(userService.getAllUsers()).thenReturn(List.of(userModel));
+    void testGetAllUsers() throws Exception {
+        UserModel user1 = new UserModel(1L, "John Doe", "123", null);
+        UserModel user2 = new UserModel(2L, "Jane Doe", "456", null);
+        List<UserModel> users = List.of(user1, user2);
+
+        when(userService.getAllUsers()).thenReturn(users);
 
         mockMvc.perform(get("/api/users"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$[0].username").value("John Doe"))  // Use username
-                .andExpect(jsonPath("$[0].password").value("123"));  // Use password
+                .andExpect(jsonPath("$.result.length()").value(2))
+                .andExpect(jsonPath("$.result[0].username").value("John Doe"))
+                .andExpect(jsonPath("$.result[1].username").value("Jane Doe"))
+                .andExpect(jsonPath("$.code").value(ResponseCode.SUCCESS.name()));
     }
 
     @Test
-    public void testGetUserById() throws Exception {
-        when(userService.getUser(1L)).thenReturn(userModel);
+    void testGetUserById() throws Exception {
+        UserModel user = new UserModel(1L, "John Doe", "123", null);
 
-        mockMvc.perform(get("/api/users/1"))
+        when(userService.getUser(1L)).thenReturn(user);
+
+        mockMvc.perform(get("/api/users/{id}", 1L))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.username").value("John Doe"))  // Use username
-                .andExpect(jsonPath("$.password").value("123"));  // Use password
+                .andExpect(jsonPath("$.result.username").value("John Doe"))
+                .andExpect(jsonPath("$.result.password").value("123"))
+                .andExpect(jsonPath("$.code").value(ResponseCode.SUCCESS.name()));
     }
 
     @Test
-    public void testCreateUser() throws Exception {
-        UserModel newUser = new UserModel();
-        newUser.setUsername("Jane Doe");
-        newUser.setPassword("123");
+    void testCreateUser() throws Exception {
+        UserModel user = new UserModel(1L, "John Doe", "123", null);
 
-        when(userService.createUser(newUser)).thenReturn(newUser);
+        when(userService.createUser(any(UserModel.class))).thenReturn(user);
 
         mockMvc.perform(post("/api/users")
-                        .contentType("application/json")
-                        .content("{ \"username\": \"Jane Doe\", \"password\": \"123\" }"))  // Use correct keys
-                .andExpect(status().isCreated())
-                .andExpect(jsonPath("$.username").value("Jane Doe"))
-                .andExpect(jsonPath("$.password").value("123"));
-    }
-
-    @Test
-    public void testUpdateUser() throws Exception {
-        UserModel updatedUser = new UserModel();
-        updatedUser.setId(1L);
-        updatedUser.setUsername("Johnathan Doe");
-        updatedUser.setPassword("test123");
-
-        when(userService.updateUser(1L, updatedUser)).thenReturn(updatedUser);
-
-        mockMvc.perform(put("/api/users/1")
-                        .contentType("application/json")
-                        .content("{ \"username\": \"Johnathan Doe\", \"password\": \"test123\" }"))  // Use correct keys
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(user)))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.username").value("Johnathan Doe"))
-                .andExpect(jsonPath("$.password").value("test123"));
+                .andExpect(jsonPath("$.result.username").value("John Doe"))
+                .andExpect(jsonPath("$.result.password").value("123"))
+                .andExpect(jsonPath("$.code").value(ResponseCode.SUCCESS.name()));
     }
 
     @Test
-    public void testDeleteUser() throws Exception {
-        mockMvc.perform(delete("/api/users/1"))
-                .andExpect(status().isNoContent());
+    void testUpdateUser() throws Exception {
+        UserModel updatedUser = new UserModel(1L, "Johnathan Doe", "test123", null);
+
+        when(userService.updateUser(eq(1L), any(UserModel.class))).thenReturn(updatedUser);
+
+        mockMvc.perform(put("/api/users/{id}", 1L)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(updatedUser)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.result.username").value("Johnathan Doe"))
+                .andExpect(jsonPath("$.result.password").value("test123"))
+                .andExpect(jsonPath("$.code").value(ResponseCode.SUCCESS.name()));
+    }
+
+    @Test
+    void testDeleteUser() throws Exception {
+        doNothing().when(userService).deleteUser(1L);
+
+        mockMvc.perform(delete("/api/users/{id}", 1L))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.code").value(ResponseCode.SUCCESS.name()));
+
+        verify(userService, times(1)).deleteUser(1L);
     }
 }

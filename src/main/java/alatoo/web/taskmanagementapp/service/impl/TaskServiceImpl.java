@@ -2,6 +2,7 @@ package alatoo.web.taskmanagementapp.service.impl;
 
 import alatoo.web.taskmanagementapp.dto.TaskModel;
 import alatoo.web.taskmanagementapp.entity.Task;
+import alatoo.web.taskmanagementapp.exception.NotFoundException;
 import alatoo.web.taskmanagementapp.mapper.TaskMapper;
 import alatoo.web.taskmanagementapp.repo.TaskRepository;
 import alatoo.web.taskmanagementapp.service.TaskService;
@@ -32,7 +33,7 @@ public class TaskServiceImpl implements TaskService {
     @Override
     public TaskModel getTaskById(Long id) {
         Task task = taskRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Task not found with id " + id));
+                .orElseThrow(() -> new NotFoundException(String.format("Task not found with id %s",  id)));
         return taskMapper.toDTO(task);
     }
 
@@ -48,14 +49,13 @@ public class TaskServiceImpl implements TaskService {
         Optional<Task> optionalTask = taskRepository.findById(id);
         if (optionalTask.isPresent()) {
             Task existingTask = optionalTask.get();
-            // Update the task fields (if needed)
             existingTask.setTitle(taskModel.getTitle());
             existingTask.setDescription(taskModel.getDescription());
             existingTask.setStatus(taskModel.getStatus());
             taskRepository.save(existingTask);
             return taskMapper.toDTO(existingTask);
         } else {
-            throw new RuntimeException("Task not found with id " + id);
+            throw new NotFoundException(String.format("Task not found with id %s",  id));
         }
     }
 
@@ -64,7 +64,7 @@ public class TaskServiceImpl implements TaskService {
         if (taskRepository.existsById(id)) {
             taskRepository.deleteById(id);
         } else {
-            throw new RuntimeException("Task not found with id " + id);
+            throw new NotFoundException(String.format("Task not found with id %s",  id));
         }
     }
 }

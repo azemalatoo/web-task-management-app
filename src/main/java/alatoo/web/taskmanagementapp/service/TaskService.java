@@ -6,13 +6,13 @@ import java.util.List;
 
 public interface TaskService {
 
-    List<TaskModel> getAllTasks(); // Read all tasks
+    List<TaskModel> getAllTasks();
 
-    TaskModel getTaskById(Long id); // Read a task by ID
+    TaskModel getTaskById(Long id);
 
-    TaskModel createTask(TaskModel taskModel); // Create a new task
+    TaskModel createTask(TaskModel taskModel);
 
-    TaskModel updateTask(Long id, TaskModel taskModel); // Update an existing task
+    TaskModel updateTask(Long id, TaskModel taskModel);
 
-    void deleteTask(Long id); // Delete a task by ID
+    void deleteTask(Long id);
 }

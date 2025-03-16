@@ -1,26 +1,26 @@
 package alatoo.web.taskmanagementapp.controller;
 
 import alatoo.web.taskmanagementapp.dto.TaskModel;
-import alatoo.web.taskmanagementapp.enums.TaskStatus;
+import alatoo.web.taskmanagementapp.response.ResponseCode;
 import alatoo.web.taskmanagementapp.service.TaskService;
+import alatoo.web.taskmanagementapp.enums.TaskStatus;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.springframework.boot.test.context.SpringBootTest;
+import org.mockito.MockitoAnnotations;
+import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import java.util.List;
 
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-@SpringBootTest
-public class TaskControllerTest {
-
-    private MockMvc mockMvc;
+class TaskControllerTest {
 
     @Mock
     private TaskService taskService;
@@ -28,82 +28,91 @@ public class TaskControllerTest {
     @InjectMocks
     private TaskController taskController;
 
-    private TaskModel taskModel;
+    private MockMvc mockMvc;
+    private ObjectMapper objectMapper;
 
     @BeforeEach
-    public void setUp() {
+    void setUp() {
+        MockitoAnnotations.openMocks(this);
         mockMvc = MockMvcBuilders.standaloneSetup(taskController).build();
-
-        taskModel = new TaskModel();
-        taskModel.setId(1L);
-        taskModel.setTitle("Test Task");
-        taskModel.setDescription("Test Task Description");
-        taskModel.setStatus(TaskStatus.PENDING);
+        objectMapper = new ObjectMapper();
     }
 
-    // Test for fetching all tasks
     @Test
-    public void testGetAllTasks() throws Exception {
-        when(taskService.getAllTasks()).thenReturn(List.of(taskModel));
+    void testGetAllTasks() throws Exception {
+        TaskModel task1 = new TaskModel(1L, "Task 1", "Description of Task 1", TaskStatus.PENDING, 100L);
+        TaskModel task2 = new TaskModel(2L, "Task 2", "Description of Task 2", TaskStatus.COMPLETED, 101L);
+        List<TaskModel> tasks = List.of(task1, task2);
+
+        when(taskService.getAllTasks()).thenReturn(tasks);
 
         mockMvc.perform(get("/api/tasks"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$").isArray())  // Check if the response is an array
-                .andExpect(jsonPath("$").isNotEmpty());  // Check if the array is not empty
+                .andExpect(jsonPath("$.result.length()").value(2))
+                .andExpect(jsonPath("$.result[0].title").value("Task 1"))
+                .andExpect(jsonPath("$.result[1].title").value("Task 2"))
+                .andExpect(jsonPath("$.result[0].status").value(TaskStatus.PENDING.toString()))
+                .andExpect(jsonPath("$.result[1].status").value(TaskStatus.COMPLETED.toString()))
+                .andExpect(jsonPath("$.code").value(ResponseCode.SUCCESS.name()));
     }
 
-    // Test for fetching a task by ID
     @Test
-    public void testGetTaskById() throws Exception {
-        when(taskService.getTaskById(1L)).thenReturn(taskModel);
+    void testGetTaskById() throws Exception {
+        TaskModel task = new TaskModel(1L, "Task 1", "Description of Task 1", TaskStatus.PENDING, 100L);
 
-        mockMvc.perform(get("/api/tasks/1"))
+        when(taskService.getTaskById(1L)).thenReturn(task);
+
+        mockMvc.perform(get("/api/tasks/{id}", 1L))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$").isNotEmpty());  // Check if the response body is not empty
+                .andExpect(jsonPath("$.result.title").value("Task 1"))
+                .andExpect(jsonPath("$.result.description").value("Description of Task 1"))
+                .andExpect(jsonPath("$.result.status").value(TaskStatus.PENDING.toString()))
+                .andExpect(jsonPath("$.result.userId").value(100L))
+                .andExpect(jsonPath("$.code").value(ResponseCode.SUCCESS.name()));
     }
 
-    // Test for creating a task
     @Test
-    public void testCreateTask() throws Exception {
-        TaskModel newTask = new TaskModel();
-        newTask.setTitle("New Task");
-        newTask.setDescription("This is a new task.");
-        newTask.setStatus(TaskStatus.PENDING);
+    void testCreateTask() throws Exception {
+        TaskModel task = new TaskModel(1L, "Task 1", "Description of Task 1", TaskStatus.PENDING, 100L);
 
-        when(taskService.createTask(newTask)).thenReturn(newTask);
+        when(taskService.createTask(any(TaskModel.class))).thenReturn(task);
 
         mockMvc.perform(post("/api/tasks")
-                        .contentType("application/json")
-                        .content("{ \"title\": \"New Task\", \"description\": \"This is a new task.\", \"status\": \"PENDING\" }"))
-                .andExpect(status().isCreated())
-                .andExpect(jsonPath("$").isNotEmpty());  // Ensure the response is not empty
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(task)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.result.title").value("Task 1"))
+                .andExpect(jsonPath("$.result.description").value("Description of Task 1"))
+                .andExpect(jsonPath("$.result.status").value(TaskStatus.PENDING.toString()))
+                .andExpect(jsonPath("$.result.userId").value(100L))
+                .andExpect(jsonPath("$.code").value(ResponseCode.SUCCESS.name()));
     }
 
-    // Test for updating a task
     @Test
-    public void testUpdateTask() throws Exception {
-        TaskModel updatedTask = new TaskModel();
-        updatedTask.setId(1L);
-        updatedTask.setTitle("Updated Task");
-        updatedTask.setDescription("Updated Task Description");
-        updatedTask.setStatus(TaskStatus.IN_PROGRESS);
+    void testUpdateTask() throws Exception {
+        TaskModel task = new TaskModel(1L, "Updated Task", "Updated description", TaskStatus.IN_PROGRESS, 101L);
 
-        // Mock the service to return the updated task
-        when(taskService.updateTask(1L, updatedTask)).thenReturn(updatedTask);
+        when(taskService.updateTask(eq(1L), any(TaskModel.class))).thenReturn(task);
 
-        mockMvc.perform(put("/api/tasks/1")
-                        .contentType("application/json")
-                        .content("{ \"title\": \"Updated Task\", \"description\": \"Updated Task Description\", \"status\": \"IN_PROGRESS\" }"))
-                .andExpect(status().isOk())  // Ensure the status code is 200 OK
-                .andExpect(jsonPath("$").isNotEmpty())  // Check if the response body is not empty
-                .andExpect(jsonPath("$.id").value(1))  // You can also check if the ID is correct
-                .andExpect(jsonPath("$.status").value("IN_PROGRESS"));  // Check the updated status
+        mockMvc.perform(put("/api/tasks/{id}", 1L)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(task)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.result.title").value("Updated Task"))
+                .andExpect(jsonPath("$.result.description").value("Updated description"))
+                .andExpect(jsonPath("$.result.status").value(TaskStatus.IN_PROGRESS.toString()))
+                .andExpect(jsonPath("$.result.userId").value(101L))
+                .andExpect(jsonPath("$.code").value(ResponseCode.SUCCESS.name()));
     }
 
-    // Test for deleting a task
     @Test
-    public void testDeleteTask() throws Exception {
-        mockMvc.perform(delete("/api/tasks/1"))
-                .andExpect(status().isNoContent()); // No content response after successful deletion
+    void testDeleteTask() throws Exception {
+        doNothing().when(taskService).deleteTask(1L);
+
+        mockMvc.perform(delete("/api/tasks/{id}", 1L))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.code").value(ResponseCode.SUCCESS.name()));
+
+        verify(taskService, times(1)).deleteTask(1L);
     }
 }

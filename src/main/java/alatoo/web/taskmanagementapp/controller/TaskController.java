@@ -1,10 +1,10 @@
 package alatoo.web.taskmanagementapp.controller;
 
 import alatoo.web.taskmanagementapp.dto.TaskModel;
+import alatoo.web.taskmanagementapp.response.ResponseApi;
+import alatoo.web.taskmanagementapp.response.ResponseCode;
 import alatoo.web.taskmanagementapp.service.TaskService;
 import jakarta.validation.Valid;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -20,32 +20,32 @@ public class TaskController {
     }
 
     @GetMapping
-    public ResponseEntity<List<TaskModel>> getAllTasks() {
+    public ResponseApi<List<TaskModel>> getAllTasks() {
         List<TaskModel> tasks = taskService.getAllTasks();
-        return new ResponseEntity<>(tasks, HttpStatus.OK);
+        return new ResponseApi<>(tasks, ResponseCode.SUCCESS);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<TaskModel> getTaskById(@PathVariable Long id) {
+    public ResponseApi<TaskModel> getTaskById(@PathVariable Long id) {
         TaskModel task = taskService.getTaskById(id);
-        return new ResponseEntity<>(task, HttpStatus.OK);
+        return new ResponseApi<>(task, ResponseCode.SUCCESS);
     }
 
     @PostMapping
-    public ResponseEntity<TaskModel> createTask(@RequestBody @Valid TaskModel taskModel) {
+    public ResponseApi<TaskModel> createTask(@RequestBody @Valid TaskModel taskModel) {
         TaskModel createdTask = taskService.createTask(taskModel);
-        return new ResponseEntity<>(createdTask, HttpStatus.CREATED);
+        return new ResponseApi<>(createdTask, ResponseCode.SUCCESS);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<TaskModel> updateTask(@PathVariable Long id, @RequestBody @Valid TaskModel taskModel) {
+    public ResponseApi<TaskModel> updateTask(@PathVariable Long id, @RequestBody @Valid TaskModel taskModel) {
         TaskModel updatedTask = taskService.updateTask(id, taskModel);
-        return new ResponseEntity<>(updatedTask, HttpStatus.OK);
+        return new ResponseApi<>(updatedTask, ResponseCode.SUCCESS);
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteTask(@PathVariable Long id) {
+    public ResponseApi<String> deleteTask(@PathVariable Long id) {
         taskService.deleteTask(id);
-        return new ResponseEntity<>(HttpStatus.NO_CONTENT); // No content response after successful deletion
+        return new ResponseApi<>("Успешно удалено", ResponseCode.SUCCESS);
     }
 }
