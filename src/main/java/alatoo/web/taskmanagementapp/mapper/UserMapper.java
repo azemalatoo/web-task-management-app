@@ -20,6 +20,7 @@ public class UserMapper {
         UserModel userModel = new UserModel();
         userModel.setId(user.getId());
         userModel.setUsername(user.getUsername());
+        userModel.setPassword(user.getPassword());
         userModel.setTasks(convertToTaskModelList(user.getTasks()));
         return userModel;
     }
@@ -35,8 +36,8 @@ public class UserMapper {
 
     public User toEntity(UserModel dto) {
         User user = new User();
-        user.setId(dto.getId());
         user.setUsername(dto.getUsername());
+        user.setPassword(dto.getPassword());
         return user;
     }
 }

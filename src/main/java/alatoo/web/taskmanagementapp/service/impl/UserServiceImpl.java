@@ -2,6 +2,7 @@ package alatoo.web.taskmanagementapp.service.impl;
 
 import alatoo.web.taskmanagementapp.dto.UserModel;
 import alatoo.web.taskmanagementapp.entity.User;
+import alatoo.web.taskmanagementapp.exception.NotFoundException;
 import alatoo.web.taskmanagementapp.mapper.UserMapper;
 import alatoo.web.taskmanagementapp.repo.UserRepository;
 import alatoo.web.taskmanagementapp.service.UserService;
@@ -32,7 +33,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserModel getUser(Long id) {
         User user = userRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("User not found with id " + id));
+                .orElseThrow(() -> new NotFoundException(String.format("User not found with id %s", id)));
         return userMapper.toDTO(user);
     }
 
@@ -53,7 +54,7 @@ public class UserServiceImpl implements UserService {
             userRepository.save(existingUser);
             return userMapper.toDTO(existingUser);
         } else {
-            throw new RuntimeException("User not found with id " + id);
+            throw new NotFoundException(String.format("User not found with id %s", id));
         }
     }
 
@@ -62,7 +63,7 @@ public class UserServiceImpl implements UserService {
         if (userRepository.existsById(id)) {
             userRepository.deleteById(id);
         } else {
-            throw new RuntimeException("User not found with id " + id);
+            throw new NotFoundException(String.format("User not found with id %s", id));
         }
     }
 }

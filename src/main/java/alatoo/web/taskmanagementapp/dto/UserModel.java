@@ -9,10 +9,8 @@ public class UserModel {
     private String password;
     private List<TaskModel> tasks;
 
-    // Default constructor
     public UserModel() {}
 
-    // All-args constructor
     public UserModel(Long id, String username, String password, List<TaskModel> tasks) {
         this.id = id;
         this.password = password;
@@ -20,7 +18,6 @@ public class UserModel {
         this.tasks = tasks;
     }
 
-    // Getter and Setter for id
     public Long getId() {
         return id;
     }
@@ -29,7 +26,6 @@ public class UserModel {
         this.id = id;
     }
 
-    // Getter and Setter for username
     public String getUsername() {
         return username;
     }
@@ -38,7 +34,6 @@ public class UserModel {
         this.username = username;
     }
 
-    // Getter and Setter for tasks
     public List<TaskModel> getTasks() {
         return tasks;
     }
@@ -47,7 +42,6 @@ public class UserModel {
         this.tasks = tasks;
     }
 
-    // Optional: toString method for easier debugging/logging
     @Override
     public String toString() {
         return "UserModel{" +
