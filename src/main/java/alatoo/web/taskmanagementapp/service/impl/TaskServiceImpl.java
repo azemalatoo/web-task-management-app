@@ -67,4 +67,13 @@ public class TaskServiceImpl implements TaskService {
             throw new NotFoundException(String.format("Task not found with id %s",  id));
         }
     }
+
+    @Override
+    public List<TaskModel> getTasksByUserId(Long userId) {
+        return taskRepository.findByUserId(userId).stream()
+                .map(taskMapper::toDTO)
+                .collect(Collectors.toList());
+    }
+
+
 }

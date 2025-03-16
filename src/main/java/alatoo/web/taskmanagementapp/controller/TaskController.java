@@ -25,6 +25,12 @@ public class TaskController {
         return new ResponseApi<>(tasks, ResponseCode.SUCCESS);
     }
 
+    @GetMapping("/byUser")
+    public ResponseApi<List<TaskModel>> getAllTasksByUserId(@RequestParam Long userId) {
+        List<TaskModel> tasks = taskService.getTasksByUserId(userId);
+        return new ResponseApi<>(tasks, ResponseCode.SUCCESS);
+    }
+
     @GetMapping("/{id}")
     public ResponseApi<TaskModel> getTaskById(@PathVariable Long id) {
         TaskModel task = taskService.getTaskById(id);
