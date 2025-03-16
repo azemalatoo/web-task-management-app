@@ -1,4 +1,4 @@
-package org.example.webtaskmanagementapp;
+package alatoo.web.taskmanagementapp;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;

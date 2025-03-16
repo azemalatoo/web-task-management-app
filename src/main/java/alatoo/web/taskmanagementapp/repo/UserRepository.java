@@ -1,6 +1,6 @@
-package org.example.webtaskmanagementapp.repo;
+package alatoo.web.taskmanagementapp.repo;
 
-import org.example.webtaskmanagementapp.entity.User;
+import alatoo.web.taskmanagementapp.entity.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
