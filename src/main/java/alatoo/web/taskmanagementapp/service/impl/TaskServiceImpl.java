@@ -2,9 +2,12 @@ package alatoo.web.taskmanagementapp.service.impl;
 
 import alatoo.web.taskmanagementapp.dto.TaskModel;
 import alatoo.web.taskmanagementapp.entity.Task;
+import alatoo.web.taskmanagementapp.entity.User;
+import alatoo.web.taskmanagementapp.enums.TaskStatus;
 import alatoo.web.taskmanagementapp.exception.NotFoundException;
 import alatoo.web.taskmanagementapp.mapper.TaskMapper;
 import alatoo.web.taskmanagementapp.repo.TaskRepository;
+import alatoo.web.taskmanagementapp.repo.UserRepository;
 import alatoo.web.taskmanagementapp.service.TaskService;
 import org.springframework.stereotype.Service;
 
@@ -16,10 +19,12 @@ import java.util.stream.Collectors;
 public class TaskServiceImpl implements TaskService {
 
     private final TaskRepository taskRepository;
+    private final UserRepository userRepository;
     private final TaskMapper taskMapper;
 
-    public TaskServiceImpl(TaskRepository taskRepository, TaskMapper taskMapper) {
+    public TaskServiceImpl(TaskRepository taskRepository, UserRepository userRepository, TaskMapper taskMapper) {
         this.taskRepository = taskRepository;
+        this.userRepository = userRepository;
         this.taskMapper = taskMapper;
     }
 
@@ -40,6 +45,8 @@ public class TaskServiceImpl implements TaskService {
     @Override
     public TaskModel createTask(TaskModel taskModel) {
         Task task = taskMapper.toEntity(taskModel);
+        task.setStatus(TaskStatus.PENDING);
+        task.setUser(getUserById(taskModel.getUserId()));
         task = taskRepository.save(task);
         return taskMapper.toDTO(task);
     }
@@ -52,6 +59,7 @@ public class TaskServiceImpl implements TaskService {
             existingTask.setTitle(taskModel.getTitle());
             existingTask.setDescription(taskModel.getDescription());
             existingTask.setStatus(taskModel.getStatus());
+            existingTask.setUser(getUserById(taskModel.getUserId()));
             taskRepository.save(existingTask);
             return taskMapper.toDTO(existingTask);
         } else {
@@ -75,5 +83,8 @@ public class TaskServiceImpl implements TaskService {
                 .collect(Collectors.toList());
     }
 
-
+    private User getUserById(Long userId) {
+        return userRepository.findById(userId)
+                .orElseThrow(() -> new NotFoundException(String.format("User not found with id %s", userId)));
+    }
 }

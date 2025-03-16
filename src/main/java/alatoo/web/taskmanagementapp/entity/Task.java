@@ -1,7 +1,6 @@
 package alatoo.web.taskmanagementapp.entity;
 
 import jakarta.persistence.*;
-import jakarta.validation.constraints.NotBlank;
 import alatoo.web.taskmanagementapp.enums.TaskStatus;
 
 @Entity
@@ -11,22 +10,21 @@ public class Task {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @NotBlank
+    @Column(nullable = false)
     private String title;
 
     private String description;
 
     @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
     private TaskStatus status;
 
     @ManyToOne
-    @JoinColumn(name = "user_id")
+    @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
-    // Default constructor
     public Task() {}
 
-    // All-args constructor
     public Task(Long id, String title, String description, TaskStatus status, User user) {
         this.id = id;
         this.title = title;
@@ -35,7 +33,6 @@ public class Task {
         this.user = user;
     }
 
-    // Getter and Setter for id
     public Long getId() {
         return id;
     }
@@ -44,7 +41,6 @@ public class Task {
         this.id = id;
     }
 
-    // Getter and Setter for title
     public String getTitle() {
         return title;
     }
@@ -53,7 +49,6 @@ public class Task {
         this.title = title;
     }
 
-    // Getter and Setter for description
     public String getDescription() {
         return description;
     }
@@ -62,7 +57,6 @@ public class Task {
         this.description = description;
     }
 
-    // Getter and Setter for status
     public TaskStatus getStatus() {
         return status;
     }
@@ -71,7 +65,6 @@ public class Task {
         this.status = status;
     }
 
-    // Getter and Setter for user
     public User getUser() {
         return user;
     }
@@ -80,7 +73,6 @@ public class Task {
         this.user = user;
     }
 
-    // Optional: You can define a toString method if needed
     @Override
     public String toString() {
         return "Task{" +

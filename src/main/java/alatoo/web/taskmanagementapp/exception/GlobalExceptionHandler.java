@@ -2,6 +2,8 @@ package alatoo.web.taskmanagementapp.exception;
 
 import alatoo.web.taskmanagementapp.response.ResponseApi;
 import alatoo.web.taskmanagementapp.response.ResponseCode;
+import jakarta.validation.ConstraintViolation;
+import jakarta.validation.ConstraintViolationException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -10,6 +12,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
@@ -32,6 +35,21 @@ public class GlobalExceptionHandler {
         });
 
         return new ResponseApi<>(null, ResponseCode.BAD_REQUEST, String.valueOf(errors));
+    }
+
+    @ExceptionHandler(ConstraintViolationException.class)
+    public ResponseApi<String> handleConstraintViolation(ConstraintViolationException ex) {
+        StringBuilder errorMessage = new StringBuilder();
+        Set<ConstraintViolation<?>> violations = ex.getConstraintViolations();
+
+        for (ConstraintViolation<?> violation : violations) {
+            errorMessage.append(violation.getPropertyPath())
+                    .append(" - ")
+                    .append(violation.getMessage())
+                    .append("\n");
+        }
+
+        return new ResponseApi<>(null, ResponseCode.BAD_REQUEST, String.valueOf(errorMessage));
     }
 
     @ExceptionHandler(Exception.class)

@@ -1,13 +1,17 @@
 package alatoo.web.taskmanagementapp.dto;
 
 import alatoo.web.taskmanagementapp.enums.TaskStatus;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 
 public class TaskModel {
 
     private Long id;
+    @NotBlank(message = "title cannot be blank")
     private String title;
     private String description;
     private TaskStatus status;
+    @NotNull(message = "userId cannot be null")
     private Long userId;
 
     public TaskModel() {}

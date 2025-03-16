@@ -1,7 +1,6 @@
 package alatoo.web.taskmanagementapp.entity;
 
 import jakarta.persistence.*;
-import jakarta.validation.constraints.NotBlank;
 
 import java.util.List;
 
@@ -13,19 +12,17 @@ public class User {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @NotBlank
+    @Column(nullable = false)
     private String username;
 
-    @NotBlank
+    @Column(nullable = false)
     private String password;
 
     @OneToMany(mappedBy = "user", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private List<Task> tasks;
 
-    // Default constructor
     public User() {}
 
-    // All-args constructor
     public User(Long id, String username, String password, List<Task> tasks) {
         this.id = id;
         this.username = username;
@@ -33,7 +30,6 @@ public class User {
         this.tasks = tasks;
     }
 
-    // Getter and Setter for id
     public Long getId() {
         return id;
     }
@@ -42,7 +38,6 @@ public class User {
         this.id = id;
     }
 
-    // Getter and Setter for username
     public String getUsername() {
         return username;
     }
@@ -51,7 +46,6 @@ public class User {
         this.username = username;
     }
 
-    // Getter and Setter for password
     public String getPassword() {
         return password;
     }
@@ -60,7 +54,6 @@ public class User {
         this.password = password;
     }
 
-    // Getter and Setter for tasks
     public List<Task> getTasks() {
         return tasks;
     }
@@ -69,7 +62,6 @@ public class User {
         this.tasks = tasks;
     }
 
-    // toString method for easier debugging/logging
     @Override
     public String toString() {
         return "User{" +

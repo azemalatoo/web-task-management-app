@@ -1,11 +1,15 @@
 package alatoo.web.taskmanagementapp.dto;
 
+import jakarta.validation.constraints.NotBlank;
+
 import java.util.List;
 
 public class UserModel {
 
     private Long id;
+    @NotBlank(message = "username cannot be blank")
     private String username;
+    @NotBlank(message = "password cannot be blank")
     private String password;
     private List<TaskModel> tasks;
 
