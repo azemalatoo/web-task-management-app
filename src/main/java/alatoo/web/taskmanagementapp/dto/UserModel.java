@@ -6,14 +6,16 @@ public class UserModel {
 
     private Long id;
     private String username;
+    private String password;
     private List<TaskModel> tasks;
 
     // Default constructor
     public UserModel() {}
 
     // All-args constructor
-    public UserModel(Long id, String username, List<TaskModel> tasks) {
+    public UserModel(Long id, String username, String password, List<TaskModel> tasks) {
         this.id = id;
+        this.password = password;
         this.username = username;
         this.tasks = tasks;
     }
@@ -53,5 +55,13 @@ public class UserModel {
                 ", username='" + username + '\'' +
                 ", tasks=" + tasks +
                 '}';
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
     }
 }
