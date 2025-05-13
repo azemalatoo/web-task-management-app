@@ -34,16 +34,29 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-            .csrf().disable()
-            .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/api/auth/**", "/swagger-ui/**", "/v3/api-docs/**").permitAll()
+                .csrf().disable()
+                .headers().frameOptions().disable()
+                .and()
+                .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+                .and()
+                .authorizeHttpRequests()
+                // Swagger
+                .requestMatchers(
+                        "/swagger-ui.html",
+                        "/swagger-ui/**",
+                        "/v3/api-docs/**",
+                        "/api-docs/**"
+                ).permitAll()
+
+                // Public auth routes
+                .requestMatchers("/api/auth/**", "/login/**", "/swagger-ui/**", "/v3/api-docs/**").permitAll()
+                // Secure all other endpoints
                 .anyRequest().authenticated()
-            )
-            .oauth2Login(oauth2 -> oauth2
+                .and()
+                .oauth2Login()
                 .successHandler(oAuth2SuccessHandler)
-            )
-            .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-            .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
+                .and()
+                .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }

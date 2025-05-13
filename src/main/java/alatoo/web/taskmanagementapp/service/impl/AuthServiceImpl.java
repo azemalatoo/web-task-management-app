@@ -12,6 +12,7 @@ import alatoo.web.taskmanagementapp.repo.UserRepository;
 import alatoo.web.taskmanagementapp.security.JwtUtil;
 import alatoo.web.taskmanagementapp.service.AuthService;
 import jakarta.mail.MessagingException;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -44,7 +45,8 @@ public class AuthServiceImpl implements AuthService {
 
     @Override
     public String initiateLogin(AuthRequest authRequest) throws MessagingException {
-        User user = userRepository.findByUsername(authRequest.getUsername()).orElseThrow();
+        User user = userRepository.findByUsername(authRequest.getUsername())
+                .orElseThrow(() -> new UsernameNotFoundException(String.format("User not found by username %s ", authRequest.getUsername())));
         if (!passwordEncoder.matches(authRequest.getPassword(), user.getPassword())) {
             return "Invalid username or password";
         }
