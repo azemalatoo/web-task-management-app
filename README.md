@@ -68,3 +68,28 @@ Swagger is integrated into the project using **Springdoc OpenAPI** to automatica
 
 - **API Documentation URL**:  
   After running the app, you can access the Swagger UI at: http://localhost:8080/swagger-ui.html
+
+## Security Overview
+
+Features:
+
+Login & Registration with password
+
+Google OAuth2 login
+
+2FA via Email (OTP)
+
+JWT (access & refresh tokens)
+
+Swagger API documentation
+
+Auth Flow:
+
+POST /api/auth/register – Register new user
+
+POST /api/auth/login – Validate password & send OTP to email
+
+POST /api/auth/verify-otp – Submit OTP & receive tokens
+
+POST /api/auth/refresh – Get new access token with refresh token
+
